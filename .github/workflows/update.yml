@@ -1,0 +1,36 @@
+name: Update Garbage Data
+
+on:
+  schedule:
+    # 毎週日曜日の午前0時に自動実行（UTC時間なのでJSTだと午前9時）
+    - cron: '0 0 * * 0'
+  workflow_dispatch: # ボタン一つでいつでも手動実行できる設定
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v3
+
+      - name: Pythonのセットアップ
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: 必要なライブラリのインストール
+        run: |
+          pip install pandas openpyxl requests
+
+      - name: スクレイパー実行
+        run: python scraper.py
+
+      - name: 変更があればGitHubに保存
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add asaka_gomi.json
+          if ! git diff --staged --quiet; then
+            git commit -m "Auto-update garbage data"
+            git push
+          fi
