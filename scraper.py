@@ -24,6 +24,7 @@ def convert_excel_to_json():
         # 3. 空の行（品名が入っていない行）を除去
 
 
+
         df_clean = df_clean.dropna(subset=['name'])
 
         # --- ここを追加：空欄(NaN)を空文字("")に変換 ---
